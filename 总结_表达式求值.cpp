@@ -1,61 +1,91 @@
-#include <iostream>
-#include  <string.h>
+#include<iostream>
+#include<stack>
+#include<string.h>
+#include<map>
 using namespace std;
-
-char st[1000], stack[1000], ls;
-int a[1000], la;
-
-void init() {
-    int len = strlen(st);
-    if (st[0]<'0' || st[0]>'9') {
-        for (int i=len; i>=1; i--) st[i] = st[i-1];
-        st[0] = '0';
+string st;
+stack<char> op;
+stack<int> dig;
+map<char,int> m;
+bool is_number(char c){
+  return c >= '0' && c <= '9';
+}
+void cal(char c){
+  int b = dig.top();
+  dig.pop();
+  int a = dig.top();
+  dig.pop();
+  switch(c){
+    case '+':{
+      dig.push(a + b);
+        break;
     }
-    la = ls = 0;
-    st[len++] = '#';
-    st[len] = 0;
-}
-
-int prior() {
-    if (ls <= 1) return 0;
-    if (stack[ls-1] == '#') return 1;
-    if ((stack[ls-1] == '+' || stack[ls-1] == '-') && (stack[ls-2] == '+' || stack[ls-2] == '-')) return 1;
-    if ((stack[ls-1] == '*' || stack[ls-1] == '/') && (stack[ls-2] == '*' || stack[ls-2] == '/')) return 1;
-    if ((stack[ls-1] == '+' || stack[ls-1] == '-') && (stack[ls-2] == '*' || stack[ls-2] == '/')) return 1;
-    return 0;
-}
-
-void calculate() {
-    switch (stack[ls - 2]) {
-        case '+' : a[la-2] = a[la-2] + a[la-1]; break;
-        case '-' : a[la-2] = a[la-2] - a[la-1]; break;
-        case '*' : a[la-2] = a[la-2] * a[la-1]; break;
-        case '/' : a[la-2] = a[la-2] / a[la-1]; break;
+    case '-':{
+      dig.push(a - b);
+        break;
     }
-    stack[ls - 2] = stack[ls - 1];
-    ls--;
-    la--;
+    case '*':{
+      dig.push(a * b);
+        break;
+    }
+    case '/':{
+      dig.push(a / b);
+        break;
+    }
+  }
 }
+int main(){
+  m['#'] = 1;
+  m['+'] = 2;
+  m['-'] = 2;
+  m['*'] = 3;
+  m['/'] = 3;
 
-int main() {
-    while (cin >> st) {
-        init();
+  while(cin >> st){
 
-        int i = 0;
-        while (st[i]) {
-            if (st[i]>='0' && st[i]<='9') {
-                int j = 0;
-                while (st[i]>='0' && st[i]<='9') j = j*10+st[i++]-'0';
-                //操作数栈
-                a[la++] = j;
-            } else {
-                //操作符栈
-                stack[ls++] = st[i++];
-                while (prior()) calculate();
-            }
+    st += '#';
+
+    while(!op.empty()) op.pop();
+    while(!dig.empty()) dig.pop();
+
+    op.push('#');
+
+    int l = st.length();
+    int i = 0;
+    while(i < l){
+      if(is_number(st[i])){
+        int v = 0;
+        while(is_number(st[i]))
+        v = v * 10 + st[i++] - '0';
+        dig.push(v);
+      // 处理 + - * /四则运算的符号
+      }else if(m[st[i]]){
+        char f = st[i];
+        while(m[f] <= m[op.top()]){
+          char c = op.top();
+          if(f == '#' && c == '#') break;
+          op.pop();
+          cal(c);
         }
-        while (prior()) calculate();
-
-        cout << a[0] << endl;
+        op.push(f);
+        i++;
+      }else if(st[i] == '('){
+        //遇到左括号压入stack
+        op.push('(');
+        i++;
+      }else if(st[i] == ')'){
+        while(op.top() != '('){
+          char c = op.top();
+          op.pop();
+          cal(c);
+        }
+        op.pop();//弹出左括号
+        i++;
+      }
     }
+
+    // if(!dig.empty())
+    cout << dig.top() << endl;
+  }
+  return 0;
 }

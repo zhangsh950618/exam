@@ -63,6 +63,7 @@ int main(){
             while(op.top() != '('){
               char c = op.top();
               op.pop();
+
               cal(c);
             }
             op.pop();

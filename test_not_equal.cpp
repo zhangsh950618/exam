@@ -2,9 +2,8 @@
 using namespace std;
 int main(){
 
-    cout << 223 / 100 % 10 << endl;
 
-
+    cout << ("a" < "abc") << endl;
 
     return 0;
 }

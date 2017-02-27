@@ -2,93 +2,65 @@
 #include<string.h>
 using namespace std;
 const int maxn = 1000;
-string a,b;
-int num_a[maxn],num_b[maxn];
-int add_res[maxn],sub_res[maxn],mul_res[maxn * 2],tem_res[maxn * 2];
-int len_a,len_b;
-void add(){
-  int flag = 0;
-  int len = max(len_a,len_b);
-  for(int i = 0 ; i <= len ; i++){
-    int sum = num_a[i] + num_b[i] + flag;
-    add_res[i] = sum % 10;
-    flag = sum / 10;
+int la, lb;
+bool has_swap;
+void add (string a, string b){
+  int s = 0;
+  for(int i = la -1,j = lb - 1  ; i >= 0 ; i--, j--){
+    s += a[i] - '0';
+    if(j >= 0) s+= b[j] - '0';
+    a[i] = s % 10 + '0';
+    s /= 10;
   }
-  if(add_res[len])
-  cout << add_res[len];
-  for(int i = len - 1 ; i >= 0 ;i--){
-    cout << add_res[i];
-  }
-  cout << endl;
+  if(s) cout << s;
+  cout << a << endl;
 }
-int cmp(){
-  int len = max(num_a,num_b);
-  for()
+void sub(string a, string b){
+  if(has_swap) cout << "-";
+  for(int i = la -1 ,j = lb - 1 ; i >= 0 ; i--, j--){
+    int s = a[i] - '0';
+    if(j >= 0) s -= b[j] - '0';
+    if(s < 0){
+      a[i - 1]--;
+      s += 10;
+    }
+    a[i] = s % 10 + '0';
+  }
+  int i = 0;
+  while(a[i] == '0' && i < la - 1) i ++;
+  a = a.substr(i);
+  cout << a << endl;
 }
-void sub(){
-  int flag = 0;
-  int len = max(len_a,len_b);
-  for(int i = 0 ; i < len ; i++){
-      int sum = num_a[i] - num_b[i] - flag;
-      if(sum < 0 && i + 1 < len_a){
-        sum += 10;
-        flag = 1;
-      }else{
-        flag = 0;
-      }
-      sub_res[i] = sum;
+void mul(string a, string b){
+  int temp[maxn] = {0};
+  for(int i = lb - 1 ; i >= 0 ; i--){
+    for(int j = la - 1 , k = i + j + 1 ; j >= 0 ; j--, k--){
+      int s = (b[i] - '0') * (a[j] - '0') + temp[k];
+      temp[k] = s % 10;
+      temp[k - 1] += s / 10;
   }
-  int i;
-  for(i = len ; i >= 0 ; i--){
-    if(sub_res[i])break;
   }
-  for(;i >= 0; i--)
-  cout <<sub_res[i];
-  cout << endl;
-}
-void mul(){
-
-  int len = 0;
-  for(int i = 0 ; i < len_b ; i++){
-    int b = num_b[i];
-    int flag = 0;
-    memset(tem_res,0,sizeof(tem_res));
-    for(int j = 0 ; j <= len_a ; j++){
-      int sum = b * num_a[j] + flag;
-      tem_res[j] = sum % 10;
-      flag = sum / 10;
-    }
-    flag = 0;
-    for(int j = 0 ; j <= len ; j++){
-      int sum = mul_res[i+j] + tem_res[j] + flag;
-      mul_res[i+j] = sum % 10;
-      flag = sum / 10;
-    }
+  int i = 0;
+  while(temp[i] == 0 && i < la + lb -1) i++;
+  string ans = "";
+  while(i < la + lb ){
+    ans += temp[i++] + '0';
   }
-  int i;
-  for(i = len_a + len_b ; ; i--){
-    if(mul_res[i] != 0){
-      break;
-    }
-  }
-  for( ; i >= 0 ; i--)
-  cout << mul_res[i];
-  cout << endl;
+  cout << ans << endl;
 }
 int main(){
-  while(cin >> a >> b){
-    memset(num_a,0,sizeof(num_a));
-    memset(num_b,0,sizeof(num_b));
-    memset(add_res,0,sizeof(add_res));
-    memset(sub_res,0,sizeof(sub_res));
-    memset(mul_res,0,sizeof(mul_res));
-    len_a = a.length();
-    len_b = b.length();
-    for(int i = 0 ; i < len_a ; i++) num_a[i] = a[len_a - 1 - i] - '0';
-    for(int i = 0 ; i < len_b ; i++) num_b[i] = b[len_b - 1 - i] - '0';
-    // add();
-    sub();
-    // mul();
+  string a, b;
+  while(cin >> a>> b){
+    has_swap = false;
+    if(a.length() < b.length() || (a.length() == b.length() && a < b)){
+        swap(a , b);
+        has_swap = true;
+    }
+    la = a.length();
+    lb = b.length();
+    add(a, b);
+    sub(a, b);
+    mul(a, b);
   }
   return 0;
 }
