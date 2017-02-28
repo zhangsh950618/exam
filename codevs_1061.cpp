@@ -1,105 +1,102 @@
 #include<iostream>
-#include<string.h>
 #include<cstdio>
+#define rep(i,n) for(int i = 0;i < n; i++)
 using namespace std;
-const int maxn = 100000 + 10;
-string s;
-int t1[maxn], t2[maxn], x[maxn],c[maxn],sa[maxn];
-int i, l;
-void build_sa(int m){
-    int *x = t1 , * y = t2;
-    for(i = 0 ; i < m ; i++) c[i] = 0;
-    for(i = 0 ; i < l ; i++) c[x[i] = s[i]]++;
-    for(i = 1 ; i < m ; i++) c[i] += c[i - 1];
-    for(i = l - 1 ; i >=0 ; i--)sa[--c[x[i]]] = i;
-
-
-    for(int k = 1 ; k <= l ; k <<= 1){
-
-        int p = 0;
-        for(i = l - k ; i < l ; i++) y[p++] = i;
-        for(i = 0 ; i < l ; i++) if(sa[i] >= k) y[p++] = sa[i] - k;
-
-        for(i = 0 ; i < m ; i++) c[i] = 0;
-        for(i = 0 ; i < l ; i++) c[x[y[i]]]++;
-        for(i = 1 ; i < m ; i++) c[i] += c[i - 1];
-        for(i = l - 1 ; i >= 0 ; i--) sa[--c[x[y[i]]]] = y[i];
-
-
-        swap(x, y);
-
-        x[sa[0]] = 0;
-        p = 0;
-        for(i = 1 ; i < l ; i++){
-            if(y[sa[i]] != y[sa[i - 1]] || y[sa[i] + k] != y[sa[i -  1] + k])
-            p++;
-            x[sa[i]] = p;
-        }
-
-        if(p == l) break;
-        m = p + 1;
-    }
+const int size  = 200005,INF = 1<<30;
+int rk[size],sa[size],height[size],w[size],wa[size],res[size];
+void getSa (int len,int up) {
+	int *k = rk,*id = height,*r = res, *cnt = wa;
+	rep(i,up) cnt[i] = 0;
+	rep(i,len) cnt[k[i] = w[i]]++;
+	rep(i,up) cnt[i+1] += cnt[i];
+	for(int i = len - 1; i >= 0; i--) {
+		sa[--cnt[k[i]]] = i;
+	}
+	int d = 1,p = 0;
+	while(p < len){
+		for(int i = len - d; i < len; i++) id[p++] = i;
+		rep(i,len)	if(sa[i] >= d) id[p++] = sa[i] - d;
+		rep(i,len) r[i] = k[id[i]];
+		rep(i,up) cnt[i] = 0;
+		rep(i,len) cnt[r[i]]++;
+		rep(i,up) cnt[i+1] += cnt[i];
+		for(int i = len - 1; i >= 0; i--) {
+			sa[--cnt[r[i]]] = id[i];
+		}
+		swap(k,r);
+		p = 0;
+		k[sa[0]] = p++;
+		rep(i,len-1) {
+			if(sa[i]+d < len && sa[i+1]+d <len &&r[sa[i]] == r[sa[i+1]]&& r[sa[i]+d] == r[sa[i+1]+d])
+				k[sa[i+1]] = p - 1;
+			else k[sa[i+1]] = p++;
+		}
+		if(p >= len) return ;
+		d *= 2,up = p, p = 0;
+	}
 }
-int rank[maxn], height[maxn];
-void get_height(){
-    int j, k = 0;
-    for(i = 1 ; i <= l ; i++) rank[sa[i]] = i;
-    for(i = 0 ; i < l ; i++) height[rank[i]] = 0;
-    for(i = 0 ; i < l ; i++){
-        if(k) k--;
-        j = sa[rank[i] - 1];
-        while(s[i + k] == s[j + k]) k++;
-        height[rank[i]] = k;
-    }
-
-
+void getHeight(int len) {
+	rep(i,len) rk[sa[i]] = i;
+	height[0] =  0;
+	for(int i = 0,p = 0; i < len - 1; i++) {
+		int j = sa[rk[i]-1];
+		while(i+p < len&& j+p < len&& w[i+p] == w[j+p]) {
+			p++;
+		}
+		height[rk[i]] = p;
+		p = max(0,p - 1);
+	}
 }
-
-bool is_number(char c){
-    return c >= '0' && c <= '9';
+int getSuffix(string s) {
+	int len = s.length(),up = 0;
+	for(int i = 0; i < len; i++) {
+		w[i] = s[i];
+		up = max(up,w[i]);
+	}
+	w[len++] = 0;
+	getSa(len,up+1);
+	getHeight(len);
+	return len;
 }
-int sa_start;
+int sa_start = INF;
+bool check(int k,int len){
+    int sa_min = sa[1], sa_max = sa[1];
+    int flag = false;
+    for(int i = 2 ; i <= len ; i++){
+        if(height[i] >= k){
 
-bool check(int k){
-    int sa_min = sa[0],sa_max = sa[0];
-    bool flag = false;
-    for(i = 1 ; i < l ; i++){
-        if(height[i] >= k && !is_number(s[sa[i]])){
-            sa_min = min(sa_min, sa[i]);
-            sa_max = max(sa_max, sa[i]);
-            if(sa_max - sa_min > k){
-                sa_start = min(sa_start, sa_min);
+           sa_min = min(sa[i], sa_min);
+           sa_max = max(sa[i], sa_max);
+           if(sa_max - sa_min > k){
                 flag = true;
-            };
+                sa_start = min(sa_start, sa_min);
+           }
         }else{
+
+
             sa_min = sa[i];
             sa_max = sa[i];
         }
+
+
+
     }
     if(flag) return true;
     return false;
-
-
 }
+string s1, s2, s;
 int main(){
-
-    while(cin >> s){
-        s += '0';
-        l = s.length();
-        build_sa(256);
-        get_height();
-        int sl = 0 ,e = l / 2, mid = (sl + e) / 2;
-        sa_start = l;
-        while(sl <= e){
-            mid = (sl + e) / 2;
-            if(check(mid)) sl = mid +1;
-            else e = mid - 1;
+    while(cin >>s){
+        int len = s.length();
+        getSuffix(s);
+        int l = 0, h = s.length() / 2, mid = (l + h) / 2;
+        while(l <= h){
+            mid = (l + h) / 2;
+            if(check(mid, len)) l = mid + 1;
+            else h = mid - 1;
         }
-//        cout << "mid = " << mid << "sa_start" << sa_start << endl;
         if(mid == 0) cout << "NO" << endl;
         else cout << s.substr(sa_start, mid) << endl;
-
-
     }
     return 0;
 }
