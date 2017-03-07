@@ -1,10 +1,8 @@
-#include<fstream>
 #include<iostream>
 #include<cstdio>
 #include<cstring>
 #define rep(i,n) for(int i = 0;i < n; i++)
 using namespace std;
-ifstream fin("1.in");
 const int size  = 200005,INF = 1<<30;
 int rk[size],sa[size],height[size],w[size],wa[size],res[size];
 void getSa (int len,int up) {
@@ -69,10 +67,12 @@ bool check(int k, int l){
     bool mark[size];
     memset(mark, false, sizeof(mark));
     int sum = 0;
+    int start = 1;
     for(int i = 1 ; i <= l ; i++){
         if(height[i] < k){
             memset(mark, false, sizeof(mark));
             sum  = 0;
+            start = i;
         }
         int j;
         for(j = 0 ; j < t ; j++){
@@ -86,8 +86,8 @@ bool check(int k, int l){
                 mark[j] = true;
                 sum ++;
                 if(sum == t){
-
-                    sa_start = min(sa_start, sa[i]);
+                    for(int k = start ; k <= i ; k++)
+                    sa_start = min(sa_start, sa[k]);
                     return true;
                 }
             }
@@ -96,13 +96,13 @@ bool check(int k, int l){
     return false;
 }
 int main(){
-    while(fin >> n){
+    while(cin >> n){
         t = 0;
-        fin >> s;
+        cin >> s;
         len[t++] = s.length();
         int l = 0, h = s.length();
         for(int i = 1 ;i < n ;i++){
-            fin >> temp;
+            cin >> temp;
             int n = temp.length();
             h = min(n, h);
             s += (char)(i + '0') + temp;
@@ -110,22 +110,21 @@ int main(){
         }
         getSuffix(s);
 
-//        for(int i = 1 ; i < s.length() ; i++)
-//        cout << s.substr(sa[i]) << " " << height[i] <<  endl;
+        for(int i = 1 ; i < s.length() ; i++)
+        cout << s.substr(sa[i]) << " " << sa[i]  <<  endl;
         for(int i = 1 ; i < t ; i++) len[i] += len[i - 1] + 1;
 //        for(int i = 0 ; i < t ; i++) cout << len[i] << endl;
 //        cout << "h = " << h << "l = " << l << endl;
         int mid = (l + h) / 2;
-        cout << "mid = " << mid << endl;
-        cout << "h = " << h << endl;
+//        cout << "mid = " << mid << endl;
+//        cout << "h = " << h << endl;
         while(l < h){
-            mid = (l + h) / 2;
+            mid=l + (h - l + 1) / 2;
 //            cout << "mid = " << mid << endl;
             if(check(mid, s.length())){ l = mid;}
             else h = mid - 1;
         }
-//        cout << "sa_start = " << sa_start << "  mid = " << mid << endl;
+        cout << "sa_start = " << sa_start << "  mid = " << mid << endl;
         if(mid) cout << s.substr(sa_start, l) << endl;
     }
 }
-

@@ -1,30 +1,51 @@
 #include<iostream>
-#include<string.h>
+#include<cstring>
 #include<map>
 using namespace std;
-map<string,int> m;
-string str;
+string st;
+map<string, int> m;
+int str2int(string s){
+    int v = 0;
+    int pre = 0;
+    int p = s.find(' ');
+    while(p != -1){
+        string sub = s.substr(pre, p - pre);
+//        cout << sub << endl;
+        v = v * 10 + m[sub];
+        pre = p + 1;
+//        cout << "p + 1 = " << (p + 1) << endl;
+        p = s.find(' ', p + 1);
+//        cout << "p = " << p << endl;
+    }
+
+    return v;
+}
 int main(){
-  m["one"] = 1;
-  m["two"] = 2;
-  m["three"] = 3;
-  m["four"] = 4;
-  m["five"] = 5;
-  m["six"] = 6;
-  m["seven"] = 7;
-  m["eight"] = 8;
-  m["nine"] = 9;
-  m["zero"] = 0;
-  m["+"] = 10;
-  m["="] = 11;
-  while(cin >> str){
-    int sum = 0,a = 0,b = 0;
-    int str2num = m[str];
-    int flag = 1;
-    if(str2num >= 0  && str2num < 10)//如果是数字
-      a = a * 10 + str2num；
+    m["zero"] = 0;
+    m["one"] = 1;
+    m["two"] = 2;
+    m["three"] = 3;
+    m["four"] = 4;
+    m["five"] = 5;
+    m["six"] = 6;
+    m["seven"] = 7;
+    m["eight"] = 8;
+    m["nine"] = 9;
+    while(getline(cin, st)){
+        int ans = 0;
+//        cout << st << endl;
+        int len = st.length();
+        int pos = st.find('+');
+        string left = st.substr(0, pos);
+        string right = st.substr(pos + 2, len - pos - 3);
+//        cout << "left : " << left  << " " <<left.length()<< endl;
+//        cout << "right : " << right << " " << right.length() << endl;
+        int a = str2int(left);
+        int b = str2int(right);
+        ans = a + b;
+        if(ans  == 0) break;
+        else cout << ans << endl;
 
-
-  }
-  return 0;
+    }
+    return 0;
 }

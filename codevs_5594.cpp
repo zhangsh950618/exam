@@ -29,6 +29,14 @@ int main(){
         double b = l.b - r.b;
         double c = l.c - r.c;
         double d = pow(b, 2) - 4 * a * c;
+        if(a == 0) cout << "MATH ERROR" << endl;
+        else if(d < 0) cout << "No Answer" << endl;
+        else{
+            double x1 = (-b + sqrt(d))/ 2 * a;
+            double x2 = (-b - sqrt(d)) / 2 * a;
+
+
+        }
     }
     return 0;
 }
