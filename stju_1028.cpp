@@ -11,13 +11,14 @@ int main(){
         bool is_if = false;
         bool ok = true;
         stack<string> s;
+        while(!s.empty()) s.pop();
         for(int i = 0 ; i < n ; i++){
             cin >> st;
             if(!ok) continue;
             if(is_if && st != "then"){ok = false; continue;}
             if(st == "if") is_if = true;
             else if(st == "then"){
-                if(is_if = false) {ok = false; break;}
+                if(is_if = false) {ok = false;}
                 else {is_if = false; s.push("if");}
             }else if(st == "begin"){
                 s.push("begin");
